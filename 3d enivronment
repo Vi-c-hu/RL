@@ -1,0 +1,110 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMa8a9OJ9u6iB2Ct1uei2F+",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Vi-c-hu/RL/blob/main/3d%20enivronment\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AimG9K-u0yPq",
+        "outputId": "b6d8bd53-0785-4d5c-b3ed-9f8c1d98749a"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Optimal Path: [0, 5, 10, 15, 20]\n"
+          ]
+        }
+      ],
+      "source": [
+        "import numpy as np\n",
+        "import random\n",
+        "\n",
+        "# Function to simulate taking an action in the environment (grid-like environment)\n",
+        "def take_action(state, action):\n",
+        "    if action == 0:  # Move left\n",
+        "        return max(0, state - 1), -1  # Moving left decrements state and incurs -1 reward\n",
+        "    elif action == 1:  # Move right\n",
+        "        return min(num_states - 1, state + 1), -1  # Moving right increments state and incurs -1 reward\n",
+        "    elif action == 2:  # Move up\n",
+        "        return max(0, state - 5), -1  # Moving up decrements state by 5 and incurs -1 reward\n",
+        "    elif action == 3:  # Move down\n",
+        "        return min(num_states - 1, state + 5), -1  # Moving down increments state by 5 and incurs -1 reward\n",
+        "\n",
+        "# Initialize Q-values\n",
+        "num_states = 21  # Placeholder for the number of states in your environment\n",
+        "num_actions = 4  # Placeholder for the number of possible actions\n",
+        "initial_state = 0  # Placeholder for the initial state\n",
+        "destination_state = 20  # Placeholder for the destination state\n",
+        "Q = np.zeros((num_states, num_actions))\n",
+        "\n",
+        "# Define Q-Learning parameters\n",
+        "epsilon = 0.1\n",
+        "alpha = 0.1\n",
+        "gamma = 0.9\n",
+        "num_episodes = 100  # Reducing the number of episodes\n",
+        "\n",
+        "# Q-Learning training\n",
+        "for _ in range(num_episodes):\n",
+        "    state = initial_state\n",
+        "    reached_destination = False\n",
+        "\n",
+        "    while not reached_destination:\n",
+        "        if random.uniform(0, 1) < epsilon:\n",
+        "            action = random.choice(range(num_actions))\n",
+        "        else:\n",
+        "            action = np.argmax(Q[state, :])\n",
+        "\n",
+        "        next_state, reward = take_action(state, action)\n",
+        "\n",
+        "        # Q-value update\n",
+        "        Q[state, action] = (1 - alpha) * Q[state, action] + alpha * (reward + gamma * np.max(Q[next_state, :]))\n",
+        "\n",
+        "        state = next_state\n",
+        "        if state == destination_state:  # Check if the destination is reached\n",
+        "            reached_destination = True\n",
+        "\n",
+        "# Path selection using Q-values\n",
+        "state = initial_state\n",
+        "optimal_path = [state]\n",
+        "\n",
+        "while state != destination_state:\n",
+        "    action = np.argmax(Q[state, :])\n",
+        "    next_state, _ = take_action(state, action)\n",
+        "    state = next_state\n",
+        "    optimal_path.append(state)\n",
+        "\n",
+        "print(\"Optimal Path:\", optimal_path)\n"
+      ]
+    }
+  ]
+}
